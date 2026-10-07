@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        {% block title %}SPPK Wisata{% endblock %}
+    </title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- CSS buatan sendiri -->
+    <link
+        href="{{ url_for('static', filename='css/style.css') }}"
+        rel="stylesheet"
+    >
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <!-- Navigasi -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+
+            <!-- Nama aplikasi -->
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                SPPK Wisata
+            </a>
+
+            <!-- Tombol navigasi pada layar kecil -->
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuNavigasi"
+                aria-controls="menuNavigasi"
+                aria-expanded="false"
+                aria-label="Buka navigasi"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Menu navigasi -->
+            <div
+                class="collapse navbar-collapse"
+                id="menuNavigasi"
+            >
+                <div class="navbar-nav ms-auto">
+
+                    <a class="nav-link" href="{{ url_for('index') }}">
+                        Beranda
+                    </a>
+
+                    <a class="nav-link" href="{{ url_for('wisata') }}">
+                        Data Wisata
+                    </a>
+
+                    <a class="nav-link" href="{{ url_for('preferensi') }}">
+                        Rekomendasi
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Isi halaman -->
+    <main class="container py-4 flex-grow-1">
+
+        <!-- Pesan notifikasi Flask -->
+        {% with pesan = get_flashed_messages(with_categories=true) %}
+            {% if pesan %}
+                {% for kategori, isi in pesan %}
+                    <div
+                        class="alert alert-{{ kategori }} alert-dismissible fade show"
+                        role="alert"
+                    >
+                        {{ isi }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Tutup"
+                        ></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Konten dari template turunan -->
+        {% block content %}{% endblock %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-top mt-auto">
+        <div class="container py-3 text-center text-muted">
+            <small>
+                Sistem Rekomendasi Tempat Wisata dengan AHP dan TOPSIS
+            </small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+</body>
+</html>

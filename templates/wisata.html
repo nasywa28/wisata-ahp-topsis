@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}
+Data Tempat Wisata
+{% endblock %}
+
+{% block content %}
+<h1>Data Tempat Wisata</h1>
+
+<p class="text-muted">
+    Data berikut digunakan sebagai matriks keputusan
+    dalam proses TOPSIS. Jarak merupakan perkiraan rute jalan dari sekitar
+    Pasar Wage, Purwokerto Timur, dan dapat berbeda sesuai titik awal maupun rute.
+</p>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-success">
+            <tr>
+                <th>No.</th>
+                <th>Wisata</th>
+                <th>Harga</th>
+                <th>Jarak dari Purwokerto Timur (km)</th>
+                <th>Fasilitas</th>
+                <th>Rating</th>
+                <th>Kebersihan</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in daftar_wisata %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <strong>{{ item.nama }}</strong>
+                        <br>
+                        <small class="text-muted">
+                            {{ item.alamat }}
+                        </small>
+                    </td>
+
+                    <td>
+                        Rp{{ "{:,.0f}".format(item.harga) }}
+                    </td>
+
+                    <td>
+                        {{ "{:,.0f}".format(item.jarak) }} km
+                    </td>
+
+                    <td>{{ item.fasilitas }}</td>
+                    <td>{{ item.rating }}</td>
+                    <td>{{ item.kebersihan }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7">
+                        Data belum tersedia.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a class="btn btn-success" href="{{ url_for('preferensi') }}">
+    Mulai Rekomendasi
+</a>
+{% endblock %}

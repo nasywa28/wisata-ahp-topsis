@@ -1,0 +1,25 @@
+body {
+    min-height: 100vh;
+}
+
+.navbar-brand {
+    font-weight: 700;
+}
+
+.card {
+    border: none;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+footer {
+    margin-top: auto;
+}

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Rekomendasi{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    {% if hasil_ahp["konsisten"] %}
+        <div class="alert alert-success" role="alert">
+            <strong>Berhasil!</strong>
+            Perbandingan konsisten (CR = {{ "%.4f"|format(hasil_ahp["cr"]) }}).
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="status">
+            <strong>Rekomendasi tetap dihitung.</strong>
+            Perbandingan awal memiliki CR = {{ "%.4f"|format(hasil_ahp["cr"]) }}
+            (batas yang disarankan 0,10). Bobot kompromi dihitung dengan
+            rata-rata geometrik dari semua pilihan Anda. Periksa kembali hasil
+            ini bila keputusan membutuhkan konsistensi AHP yang ketat.
+        </div>
+    {% endif %}
+
+    <div class="mb-4">
+        <h1 class="fw-bold text-success">
+            Hasil Rekomendasi
+        </h1>
+
+        <p class="text-muted">
+            Alternatif tempat wisata diurutkan berdasarkan
+            nilai preferensi TOPSIS tertinggi.
+        </p>
+    </div>
+
+    <section class="mb-4" aria-labelledby="judul-bobot">
+        <h2 class="h4" id="judul-bobot">Bobot Kriteria dari Pilihan Anda</h2>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Kriteria</th>
+                        <th class="text-end">Bobot</th>
+                        <th class="text-end">Persentase</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for indeks in range(daftar_kriteria|length) %}
+                        <tr>
+                            <td>{{ daftar_kriteria[indeks]["nama"] }}</td>
+                            <td class="text-end">
+                                {{ "%.4f"|format(hasil_ahp["bobot"][indeks]) }}
+                            </td>
+                            <td class="text-end">
+                                {{ "%.1f"|format(hasil_ahp["bobot"][indeks] * 100) }}%
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {% if hasil_ranking %}
+
+        <!-- Rekomendasi utama -->
+        <div class="card border-success shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                Rekomendasi Utama
+            </div>
+
+            <div class="card-body">
+                <h2 class="text-success">
+                    {{ hasil_ranking[0]["nama"] }}
+                </h2>
+
+                <p class="mb-2">
+                    <strong>Alamat:</strong>
+                    {{ hasil_ranking[0]["alamat"] }}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Nilai preferensi:</strong>
+
+                    <span class="badge bg-success fs-6">
+                        {{ "%.4f"|format(hasil_ranking[0]["nilai"]) }}
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Tabel ranking -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">
+                    Ranking Tempat Wisata
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-success">
+                            <tr>
+                                <th class="text-center">
+                                    Ranking
+                                </th>
+
+                                <th>
+                                    Tempat Wisata
+                                </th>
+
+                                <th>
+                                    Alamat
+                                </th>
+
+                                <th class="text-center">
+                                    Nilai Preferensi
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in hasil_ranking %}
+                                <tr>
+                                    <td class="text-center">
+                                        {% if loop.index == 1 %}
+                                            <span class="badge bg-success">
+                                                {{ loop.index }}
+                                            </span>
+                                        {% else %}
+                                            {{ loop.index }}
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {{ item["nama"] }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        {{ item["alamat"] }}
+                                    </td>
+
+                                    <td class="text-center">
+                                        {{ "%.4f"|format(item["nilai"]) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-warning" role="alert">
+            Data ranking belum tersedia. Silakan kembali dan lakukan
+            perhitungan rekomendasi.
+        </div>
+
+    {% endif %}
+
+    <!-- Tombol navigasi -->
+    <div class="d-flex flex-wrap gap-2">
+
+        <a class="btn btn-success" href="{{ url_for('preferensi') }}">
+            Hitung Ulang
+        </a>
+
+        <a class="btn btn-outline-success" href="{{ url_for('wisata') }}">
+            Data Wisata
+        </a>
+
+        <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">
+            Kembali ke Beranda
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
