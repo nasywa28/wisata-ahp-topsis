@@ -20,6 +20,48 @@ body {
     vertical-align: middle;
 }
 
+.comparison-pair-border {
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+}
+
+.comparison-pair:last-child {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.comparison-slider-wrap {
+    position: relative;
+}
+
+.comparison-slider {
+    --bs-form-range-thumb-bg: #198754;
+    --bs-form-range-thumb-focus-box-shadow: 0 0 0 0.25rem rgb(25 135 84 / 25%);
+    margin-bottom: 0.25rem;
+}
+
+.comparison-slider-wrap::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 0.75rem;
+    background: #495057;
+    content: "";
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+.comparison-scale {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    color: #495057;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
 footer {
     margin-top: auto;
 }

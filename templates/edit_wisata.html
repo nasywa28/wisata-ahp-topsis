@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Data Wisata{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="fw-bold">Edit Data Wisata</h1>
+    <p class="text-muted">
+        Perbarui informasi dan nilai kriteria untuk
+        <strong>{{ item_wisata["nama"] }}</strong>.
+    </p>
+</div>
+
+<section class="card shadow-sm" aria-labelledby="judul-form-edit">
+    <div class="card-body">
+        <h2 class="h4 mb-3" id="judul-form-edit">Informasi Wisata</h2>
+
+        {% if daftar_kriteria %}
+            <form
+                method="post"
+                action="{{ url_for('edit_wisata', wisata_id=item_wisata['id']) }}"
+            >
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label for="nama" class="form-label">Nama wisata</label>
+                        <input
+                            id="nama"
+                            name="nama"
+                            class="form-control"
+                            type="text"
+                            maxlength="200"
+                            value="{{ nilai_terpilih.get('nama', '') }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <input
+                            id="alamat"
+                            name="alamat"
+                            class="form-control"
+                            type="text"
+                            maxlength="300"
+                            value="{{ nilai_terpilih.get('alamat', '') }}"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label for="deskripsi" class="form-label">
+                            Deskripsi
+                        </label>
+                        <textarea
+                            id="deskripsi"
+                            name="deskripsi"
+                            class="form-control"
+                            rows="2"
+                            maxlength="1000"
+                        >{{ nilai_terpilih.get('deskripsi', '') }}</textarea>
+                    </div>
+
+                    {% for kriteria in daftar_kriteria %}
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            <label
+                                for="nilai_{{ kriteria['id'] }}"
+                                class="form-label"
+                            >
+                                {{ kriteria["nama"] }}
+                                {% if kriteria["satuan"] %}
+                                    <span class="text-muted">
+                                        ({{ kriteria["satuan"] }})
+                                    </span>
+                                {% endif %}
+                            </label>
+                            <input
+                                id="nilai_{{ kriteria['id'] }}"
+                                name="nilai_{{ kriteria['id'] }}"
+                                class="form-control"
+                                type="number"
+                                min="{% if kriteria['satuan'] == 'Skala 1-5' %}1{% else %}0{% endif %}"
+                                {% if kriteria["satuan"] == "Skala 1-5" %}
+                                    max="5"
+                                {% endif %}
+                                step="any"
+                                value="{{ nilai_terpilih.get('nilai_' ~ kriteria['id'], '') }}"
+                                required
+                            >
+                            {% if kriteria["satuan"] == "Skala 1-5" %}
+                                <div class="form-text">
+                                    Masukkan nilai dari 1 sampai 5.
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        Simpan Perubahan
+                    </button>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('wisata') }}">
+                        Batal
+                    </a>
+                </div>
+            </form>
+        {% else %}
+            <div class="alert alert-warning mb-0" role="alert">
+                Data kriteria belum tersedia sehingga data wisata tidak dapat
+                diperbarui.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,68 +1,185 @@
 {% extends "base.html" %}
 
-{% block title %}
-Data Tempat Wisata
-{% endblock %}
+{% block title %}Data Tempat Wisata{% endblock %}
 
 {% block content %}
-<h1>Data Tempat Wisata</h1>
-
-<p class="text-muted">
-    Data berikut digunakan sebagai matriks keputusan
-    dalam proses TOPSIS. Jarak merupakan perkiraan rute jalan dari sekitar
-    Pasar Wage, Purwokerto Timur, dan dapat berbeda sesuai titik awal maupun rute.
-</p>
-
-<div class="table-responsive">
-    <table class="table table-bordered table-striped">
-        <thead class="table-success">
-            <tr>
-                <th>No.</th>
-                <th>Wisata</th>
-                <th>Harga</th>
-                <th>Jarak dari Purwokerto Timur (km)</th>
-                <th>Fasilitas</th>
-                <th>Rating</th>
-                <th>Kebersihan</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for item in daftar_wisata %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>
-                        <strong>{{ item.nama }}</strong>
-                        <br>
-                        <small class="text-muted">
-                            {{ item.alamat }}
-                        </small>
-                    </td>
-
-                    <td>
-                        Rp{{ "{:,.0f}".format(item.harga) }}
-                    </td>
-
-                    <td>
-                        {{ "{:,.0f}".format(item.jarak) }} km
-                    </td>
-
-                    <td>{{ item.fasilitas }}</td>
-                    <td>{{ item.rating }}</td>
-                    <td>{{ item.kebersihan }}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="7">
-                        Data belum tersedia.
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="mb-4">
+    <h1 class="fw-bold">Data Tempat Wisata</h1>
+    <p class="text-muted">
+        Data wisata dan nilainya pada setiap kriteria digunakan sebagai matriks
+        keputusan dalam proses TOPSIS.
+    </p>
 </div>
 
-<a class="btn btn-success" href="{{ url_for('preferensi') }}">
+<section class="card shadow-sm mb-4" aria-labelledby="judul-tambah-wisata">
+    <div class="card-body">
+        <h2 class="h4 mb-3" id="judul-tambah-wisata">
+            Tambah Data Wisata
+        </h2>
+
+        {% if daftar_kriteria %}
+            <form method="post" action="{{ url_for('wisata') }}">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label for="nama" class="form-label">Nama wisata</label>
+                        <input
+                            id="nama"
+                            name="nama"
+                            class="form-control"
+                            type="text"
+                            maxlength="200"
+                            value="{{ nilai_terpilih.get('nama', '') }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <input
+                            id="alamat"
+                            name="alamat"
+                            class="form-control"
+                            type="text"
+                            maxlength="300"
+                            value="{{ nilai_terpilih.get('alamat', '') }}"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label for="deskripsi" class="form-label">
+                            Deskripsi
+                        </label>
+                        <textarea
+                            id="deskripsi"
+                            name="deskripsi"
+                            class="form-control"
+                            rows="2"
+                            maxlength="1000"
+                        >{{ nilai_terpilih.get('deskripsi', '') }}</textarea>
+                    </div>
+
+                    {% for kriteria in daftar_kriteria %}
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            <label
+                                for="nilai_{{ kriteria['id'] }}"
+                                class="form-label"
+                            >
+                                {{ kriteria["nama"] }}
+                                {% if kriteria["satuan"] %}
+                                    <span class="text-muted">
+                                        ({{ kriteria["satuan"] }})
+                                    </span>
+                                {% endif %}
+                            </label>
+                            <input
+                                id="nilai_{{ kriteria['id'] }}"
+                                name="nilai_{{ kriteria['id'] }}"
+                                class="form-control"
+                                type="number"
+                                min="{% if kriteria['satuan'] == 'Skala 1-5' %}1{% else %}0{% endif %}"
+                                {% if kriteria["satuan"] == "Skala 1-5" %}
+                                    max="5"
+                                {% endif %}
+                                step="any"
+                                value="{{ nilai_terpilih.get('nilai_' ~ kriteria['id'], '') }}"
+                                required
+                            >
+                            {% if kriteria["satuan"] == "Skala 1-5" %}
+                                <div class="form-text">
+                                    Masukkan nilai dari 1 sampai 5.
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-success mt-4">
+                    Simpan Data Wisata
+                </button>
+            </form>
+        {% else %}
+            <div class="alert alert-warning mb-0" role="alert">
+                Data kriteria belum tersedia. Tambahkan kriteria sebelum
+                memasukkan data wisata.
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section aria-labelledby="judul-daftar-wisata">
+    <h2 class="h4 mb-3" id="judul-daftar-wisata">Daftar Tempat Wisata</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-success">
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Wisata</th>
+                    {% for kriteria in daftar_kriteria %}
+                        <th scope="col">
+                            {{ kriteria["nama"] }}
+                            {% if kriteria["satuan"] %}
+                                <small class="d-block fw-normal">
+                                    {{ kriteria["satuan"] }}
+                                </small>
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in daftar_wisata %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <strong>{{ item["nama"] }}</strong>
+                            {% if item["alamat"] %}
+                                <br>
+                                <small class="text-muted">
+                                    {{ item["alamat"] }}
+                                </small>
+                            {% endif %}
+                        </td>
+
+                        {% for kriteria in daftar_kriteria %}
+                            {% set nilai = item["nilai_kriteria"].get(kriteria["id"]) %}
+                            <td>
+                                {% if nilai is not none %}
+                                    {% if kriteria["satuan"] == "Rupiah" %}
+                                        Rp{{ "{:,.0f}".format(nilai) }}
+                                    {% elif kriteria["satuan"] == "Kilometer" %}
+                                        {{ "{:g}".format(nilai) }} km
+                                    {% else %}
+                                        {{ "{:g}".format(nilai) }}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td>
+                            <a
+                                class="btn btn-sm btn-outline-success"
+                                href="{{ url_for('edit_wisata', wisata_id=item['id']) }}"
+                            >
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="{{ daftar_kriteria|length + 3 }}">
+                            Data belum tersedia.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<a class="btn btn-outline-success" href="{{ url_for('preferensi') }}">
     Mulai Rekomendasi
 </a>
 {% endblock %}
